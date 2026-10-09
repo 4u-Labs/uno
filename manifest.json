@@ -1,0 +1,29 @@
+{
+  "name": "UNO Master Deluxe 4U — Jogo de Cartas Online & Offline",
+  "short_name": "UNO 4U",
+  "start_url": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#071f14",
+  "theme_color": "#0b2b1a",
+  "description": "Jogue o clássico UNO contra bots inteligentes em 1v1 ou mesa com 4 jogadores, com regras da casa, empilhamento e efeitos sonoros.",
+  "icons": [
+    {
+      "src": "favicon.png",
+      "sizes": "64x64",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["games", "card", "casual"]
+}
