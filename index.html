@@ -131,29 +131,59 @@
 
     /* Playable effects */
     .playable {
-      box-shadow: 0 16px 30px rgba(0,0,0,0.5), 0 0 0 3px #38bdf8, 0 0 20px rgba(56, 189, 248, 0.6) !important;
-      animation: bounceCard 2.5s infinite;
+      transform: translateY(-12px) !important;
+      box-shadow: 0 16px 30px rgba(0,0,0,0.5), 0 0 0 3px #facc15, 0 0 22px rgba(250, 204, 21, 0.85) !important;
+      animation: bounceCard 2.2s infinite;
+      z-index: 10;
     }
     .playable:hover {
-      transform: translateY(-12px) scale(1.06) !important;
-      box-shadow: 0 24px 38px rgba(0,0,0,0.6), 0 0 0 3px #facc15, 0 0 25px rgba(250, 204, 21, 0.8) !important;
-      z-index: 20;
+      transform: translateY(-18px) scale(1.08) !important;
+      box-shadow: 0 24px 38px rgba(0,0,0,0.6), 0 0 0 3px #facc15, 0 0 30px rgba(250, 204, 21, 1) !important;
+      z-index: 25;
     }
     @keyframes bounceCard {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-4px); }
+      0%, 100% { transform: translateY(-12px); }
+      50% { transform: translateY(-16px); }
     }
 
     .disabledCard {
-      filter: grayscale(0.55) brightness(0.75);
-      opacity: 0.65;
+      opacity: 0.88;
+      filter: saturate(0.9) brightness(0.92);
       cursor: not-allowed;
+      transform: translateY(0);
     }
 
     .hand { display: flex; gap: 8px; align-items: flex-end; justify-content: center; }
     .hand-scroll { overflow-x: auto; padding: 12px 6px; }
     .hand-scroll::-webkit-scrollbar { height: 8px; }
     .hand-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 999px; }
+
+    /* Permanent Neon Glow Mode Selector */
+    .neon-glow-select {
+      border: 2px solid #22d3ee !important;
+      box-shadow: 0 0 16px rgba(6, 182, 212, 0.75), 0 0 4px rgba(34, 211, 238, 0.9), inset 0 0 8px rgba(6, 182, 212, 0.3) !important;
+      animation: neonPulse 2.8s infinite ease-in-out;
+      background: rgba(8, 28, 48, 0.88) !important;
+    }
+    @keyframes neonPulse {
+      0%, 100% {
+        box-shadow: 0 0 14px rgba(6, 182, 212, 0.7), 0 0 4px rgba(34, 211, 238, 0.8), inset 0 0 6px rgba(6, 182, 212, 0.25);
+        border-color: #22d3ee;
+      }
+      50% {
+        box-shadow: 0 0 24px rgba(6, 182, 212, 0.95), 0 0 10px rgba(103, 232, 249, 1), inset 0 0 12px rgba(6, 182, 212, 0.45);
+        border-color: #67e8f9;
+      }
+    }
+    .neon-glow-icon {
+      color: #22d3ee !important;
+      filter: drop-shadow(0 0 6px #22d3ee) drop-shadow(0 0 12px #06b6d4) !important;
+      animation: neonIconPulse 2.8s infinite ease-in-out;
+    }
+    @keyframes neonIconPulse {
+      0%, 100% { filter: drop-shadow(0 0 5px #22d3ee); }
+      50% { filter: drop-shadow(0 0 12px #67e8f9) drop-shadow(0 0 18px #06b6d4); }
+    }
 
     /* Direction wheel */
     .direction-badge {
@@ -176,21 +206,21 @@
       position: fixed; inset: 0; pointer-events: none; z-index: 9999;
     }
 
-    /* Floating Toast */
+    /* Floating Toast no rodapé para nunca cobrir o cabeçalho nem botões */
     .toast-box {
-      position: fixed; left: 50%; top: 20px; transform: translateX(-50%);
-      background: rgba(15, 23, 42, 0.92);
-      border: 1px solid rgba(255, 255, 255, 0.18);
-      backdrop-filter: blur(12px);
+      position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%);
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(14px);
       color: white;
-      padding: 12px 20px;
-      border-radius: 16px;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.6);
-      z-index: 1000;
-      max-width: min(92vw, 600px);
+      padding: 12px 22px;
+      border-radius: 18px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.7), 0 0 20px rgba(0,0,0,0.5);
+      z-index: 9999;
+      max-width: min(92vw, 550px);
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
       font-weight: 700;
       transition: all 0.25s ease;
     }
@@ -249,11 +279,48 @@
 
       <!-- Quick Actions Toolbar -->
       <div class="flex flex-wrap items-center gap-2">
-        <!-- Modo de Jogo -->
-        <button id="btnToggleMode" class="btn-action bg-white/10 hover:bg-white/15 border border-white/10 text-xs flex items-center gap-1.5" title="Mudar Modo de Jogo">
-          <i class="fas fa-users text-cyan-400"></i>
-          <span id="modeDisplay">1v1 (Duelo)</span>
-        </button>
+        <!-- Caixa de Seleção de Modo (Permanentemente Acesa com Ícone do Dropdown Aceso) -->
+        <div class="relative" id="modeSelectWrapper">
+          <button id="btnModeDropdown" type="button" class="btn-action neon-glow-select text-xs flex items-center gap-2 font-black cursor-pointer select-none" title="Clique para escolher o Modo de Jogo">
+            <i class="fas fa-gamepad neon-glow-icon text-sm"></i>
+            <span id="modeDisplay" class="text-cyan-200 tracking-wide font-bold">Modo: 1v1 (Duelo)</span>
+            <span class="w-5 h-5 rounded-md bg-cyan-400/20 flex items-center justify-center border border-cyan-400/40">
+              <i id="modeChevron" class="fas fa-chevron-down neon-glow-icon text-[10px] transition-transform duration-200"></i>
+            </span>
+          </button>
+
+          <!-- Menu Suspenso de Opções (Dropdown) -->
+          <div id="modeDropdownMenu" class="hidden absolute left-0 top-full mt-2 w-64 rounded-2xl bg-slate-900/98 border-2 border-cyan-400 shadow-[0_20px_60px_rgba(0,0,0,0.85)] backdrop-blur-xl p-2 z-[9999]">
+            <div class="px-3 py-1.5 text-[10px] uppercase font-black tracking-wider text-cyan-400 flex items-center justify-between border-b border-cyan-500/20 mb-1">
+              <span>Selecione o Modo</span>
+              <i class="fas fa-sparkles text-cyan-300"></i>
+            </div>
+
+            <!-- Opção 1: 1v1 -->
+            <button type="button" data-mode="1v1" class="mode-item w-full flex items-center justify-between p-2.5 rounded-xl transition-all text-left hover:bg-cyan-500/20 border border-transparent hover:border-cyan-400/40 cursor-pointer">
+              <div class="flex items-center gap-2.5">
+                <span class="w-8 h-8 rounded-lg bg-cyan-500/20 text-cyan-300 flex items-center justify-center font-bold text-base shadow-sm">⚔️</span>
+                <div>
+                  <div class="text-xs font-black text-white">1v1 (Duelo Rápido)</div>
+                  <div class="text-[10px] text-white/60">Você vs Bot Adversário</div>
+                </div>
+              </div>
+              <i class="fas fa-circle-check text-cyan-400 text-sm check-1v1"></i>
+            </button>
+
+            <!-- Opção 2: Mesa 4 Jogadores -->
+            <button type="button" data-mode="4p" class="mode-item w-full flex items-center justify-between p-2.5 rounded-xl transition-all text-left hover:bg-emerald-500/20 border border-transparent hover:border-emerald-400/40 cursor-pointer mt-1">
+              <div class="flex items-center gap-2.5">
+                <span class="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-300 flex items-center justify-center font-bold text-base shadow-sm">👥</span>
+                <div>
+                  <div class="text-xs font-black text-white">Mesa com 4 Jogadores</div>
+                  <div class="text-[10px] text-white/60">Você vs Oeste, Norte e Leste</div>
+                </div>
+              </div>
+              <i class="fas fa-circle-check text-emerald-400 text-sm hidden check-4p"></i>
+            </button>
+          </div>
+        </div>
 
         <!-- Regras da Casa / Configurações -->
         <button id="btnOpenSettings" class="btn-action bg-white/10 hover:bg-white/15 border border-white/10 text-xs flex items-center gap-1.5" title="Regras da Casa">
@@ -624,6 +691,18 @@
 
   <!-- ================= SCRIPTS & GAME ENGINE ================= -->
   <script>
+    // Vibração segura compatível com políticas de ativação do navegador
+    function safeVibrate(pattern) {
+      try {
+        if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
+          if (navigator.userActivation && !navigator.userActivation.hasBeenActive) {
+            return; // Evita aviso [Intervention] antes do primeiro clique do usuário
+          }
+          navigator.vibrate(pattern);
+        }
+      } catch (e) {}
+    }
+
     // ===== ÁUDIO SINTETIZADO NATIVO (WEB AUDIO API) =====
     class SoundFX {
       constructor() {
@@ -658,7 +737,7 @@
 
       playCard() {
         this.playTone(340, 'triangle', 0.1, 0.3);
-        if (navigator.vibrate) navigator.vibrate(25);
+        safeVibrate(25);
       }
 
       drawCard() {
@@ -673,7 +752,7 @@
       penalty() {
         this.playTone(220, 'sawtooth', 0.2, 0.35);
         setTimeout(() => this.playTone(160, 'sawtooth', 0.25, 0.4), 120);
-        if (navigator.vibrate) navigator.vibrate([40, 50, 40]);
+        safeVibrate([40, 50, 40]);
       }
 
       unoDeclaration() {
@@ -681,7 +760,7 @@
         notes.forEach((n, i) => {
           setTimeout(() => this.playTone(n, 'triangle', 0.2, 0.4), i * 70);
         });
-        if (navigator.vibrate) navigator.vibrate([60, 40, 80]);
+        safeVibrate([60, 40, 80]);
       }
 
       victory() {
@@ -1299,16 +1378,25 @@
       });
 
       // Renderizar Adversários
+      const botsContainer = document.getElementById('botsContainer');
+      const botNorthCard = document.getElementById('botNorthCard');
+      const botWestCard = document.getElementById('botWestCard');
+      const botEastCard = document.getElementById('botEastCard');
+
       if (state.mode === '4p') {
-        document.getElementById('botWestCard').classList.remove('hidden');
-        document.getElementById('botEastCard').classList.remove('hidden');
+        botsContainer.className = "grid grid-cols-1 md:grid-cols-3 gap-3 items-center";
+        botWestCard.classList.remove('hidden');
+        botEastCard.classList.remove('hidden');
+        botNorthCard.className = "md:col-span-1 rounded-2xl bg-black/25 border border-white/10 p-3 flex flex-col items-center justify-center";
         document.getElementById('botWestCount').textContent = state.players[1].hand.length;
         document.getElementById('botNorthCount').textContent = state.players[2].hand.length;
         document.getElementById('botEastCount').textContent = state.players[3].hand.length;
         document.getElementById('botNorthName').textContent = "Bot Norte";
       } else {
-        document.getElementById('botWestCard').classList.add('hidden');
-        document.getElementById('botEastCard').classList.add('hidden');
+        botsContainer.className = "flex justify-center items-center w-full";
+        botWestCard.classList.add('hidden');
+        botEastCard.classList.add('hidden');
+        botNorthCard.className = "w-full max-w-xl rounded-2xl bg-black/25 border border-white/10 p-3 flex flex-col items-center justify-center";
         document.getElementById('botNorthCount').textContent = state.players[1].hand.length;
         document.getElementById('botNorthName').textContent = "Bot Adversário";
       }
@@ -1320,8 +1408,8 @@
       const displayCards = Math.min(northBot.hand.length, 12);
       for (let i = 0; i < displayCards; i++) {
         const back = document.createElement('div');
-        back.className = "card card-back";
-        const rot = displayCards <= 1 ? 0 : (-12 + i * (24 / (displayCards - 1)));
+        back.className = "card card-back shadow-md";
+        const rot = displayCards <= 1 ? 0 : (-10 + i * (20 / (displayCards - 1)));
         back.style.transform = `rotate(${rot}deg) scale(0.85)`;
         botNorthHand.appendChild(back);
       }
@@ -1442,14 +1530,58 @@
         showToast(isMuted ? "Efeitos sonoros ativados." : "Efeitos sonoros desativados.");
       });
 
-      // Alternar Modo 1v1 vs 4P
-      document.getElementById('btnToggleMode').addEventListener('click', () => {
-        state.mode = state.mode === '1v1' ? '4p' : '1v1';
+      // Controle da Caixa de Seleção / Dropdown do Modo de Jogo
+      function setMode(newMode) {
+        state.mode = newMode;
         localStorage.setItem('uno_mode', state.mode);
-        document.getElementById('modeDisplay').textContent = state.mode === '4p' ? "Mesa 4 Jogadores" : "1v1 (Duelo)";
-        showToast(`Modo alterado para ${state.mode === '4p' ? 'Mesa com 4 Jogadores' : '1v1 (Duelo)'}`);
+        updateModeUI();
+        showToast(state.mode === '4p' ? "Modo ativado: Mesa com 4 Jogadores" : "Modo ativado: 1v1 (Duelo Rápido)");
         initGame();
-      });
+      }
+
+      function updateModeUI() {
+        const is4P = state.mode === '4p';
+        document.getElementById('modeDisplay').textContent = is4P ? "Modo: Mesa 4 Jogadores" : "Modo: 1v1 (Duelo)";
+        const check1 = document.querySelector('.check-1v1');
+        const check4 = document.querySelector('.check-4p');
+        if (check1) check1.classList.toggle('hidden', is4P);
+        if (check4) check4.classList.toggle('hidden', !is4P);
+      }
+
+      const btnModeDropdown = document.getElementById('btnModeDropdown');
+      const modeDropdownMenu = document.getElementById('modeDropdownMenu');
+      const modeChevron = document.getElementById('modeChevron');
+
+      if (btnModeDropdown && modeDropdownMenu) {
+        btnModeDropdown.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const isOpen = !modeDropdownMenu.classList.contains('hidden');
+          if (isOpen) {
+            modeDropdownMenu.classList.add('hidden');
+            if (modeChevron) modeChevron.style.transform = 'rotate(0deg)';
+          } else {
+            modeDropdownMenu.classList.remove('hidden');
+            if (modeChevron) modeChevron.style.transform = 'rotate(180deg)';
+          }
+        });
+
+        document.querySelectorAll('.mode-item').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const targetMode = btn.dataset.mode;
+            setMode(targetMode);
+            modeDropdownMenu.classList.add('hidden');
+            if (modeChevron) modeChevron.style.transform = 'rotate(0deg)';
+          });
+        });
+
+        document.addEventListener('click', (e) => {
+          if (!modeDropdownMenu.contains(e.target) && !btnModeDropdown.contains(e.target)) {
+            modeDropdownMenu.classList.add('hidden');
+            if (modeChevron) modeChevron.style.transform = 'rotate(0deg)';
+          }
+        });
+      }
 
       // Novo Jogo
       document.getElementById('btnNew').addEventListener('click', initGame);
@@ -1523,7 +1655,7 @@
       });
 
       // Carregar modo inicial
-      document.getElementById('modeDisplay').textContent = state.mode === '4p' ? "Mesa 4 Jogadores" : "1v1 (Duelo)";
+      updateModeUI();
 
       // Iniciar primeira partida
       initGame();
