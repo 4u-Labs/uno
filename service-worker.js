@@ -1,48 +1,44 @@
-const CACHE_NAME = 'uno-master-v1.1.0';
-const ASSETS_TO_CACHE = [
-  './',
-  './index.html',
-  './manifest.json',
-  './favicon.png',
-  './icon-192.png',
-  './icon-512.png',
-  './apple-touch-icon.png',
-  './banner-16-9.jpg'
-];
+const CACHE_NAME = '4ulabs-uno-v3';
 
-self.addEventListener('install', (e) => {
-  self.skipWaiting();
-  e.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS_TO_CACHE)).catch(() => {})
-  );
+self.addEventListener('install', event => {
+    self.skipWaiting();
 });
 
-self.addEventListener('activate', (e) => {
-  e.waitUntil(
-    caches.keys().then((keys) => {
-      return Promise.all(
-        keys.map((key) => {
-          if (key !== CACHE_NAME) {
-            return caches.delete(key);
-          }
-        })
-      );
-    }).then(() => self.clients.claim())
-  );
+self.addEventListener('activate', event => {
+    event.waitUntil(
+        caches.keys()
+            .then(keys => Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))))
+            .then(() => self.clients.claim())
+    );
 });
 
-self.addEventListener('fetch', (e) => {
-  if (e.request.method !== 'GET') return;
-  e.respondWith(
-    caches.match(e.request).then((cachedResponse) => {
-      if (cachedResponse) return cachedResponse;
-      return fetch(e.request).then((networkResponse) => {
-        if (networkResponse && networkResponse.status === 200 && e.request.url.startsWith(self.location.origin)) {
-          const clone = networkResponse.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(e.request, clone));
-        }
-        return networkResponse;
-      }).catch(() => caches.match('./index.html'));
-    })
-  );
+self.addEventListener('fetch', event => {
+    const req = event.request;
+    if (req.method !== 'GET') return;
+    const url = new URL(req.url);
+    if (url.origin !== self.location.origin || url.pathname.includes('/api/')) return;
+
+    // Network-first for HTML/PHP/navigations so updates always load immediately
+    if (req.mode === 'navigate' || url.pathname.endsWith('.php') || url.pathname.endsWith('.html') || url.pathname.endsWith('/')) {
+        event.respondWith(
+            fetch(req).then(res => {
+                if (res && res.ok) {
+                    const copy = res.clone();
+                    caches.open(CACHE_NAME).then(c => c.put(req, copy));
+                }
+                return res;
+            }).catch(() => caches.match(req))
+        );
+        return;
+    }
+
+    event.respondWith(
+        caches.match(req).then(cached => cached || fetch(req).then(res => {
+            if (res && res.ok) {
+                const copy = res.clone();
+                caches.open(CACHE_NAME).then(c => c.put(req, copy));
+            }
+            return res;
+        }))
+    );
 });
